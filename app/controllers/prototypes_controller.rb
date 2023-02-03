@@ -4,19 +4,13 @@ class PrototypesController < ApplicationController
   before_action :contributor_confirmation, only: [:edit, :update, :destroy]
 
   def index
-    @prototypes = Prototype.all
+    @prototypes = Prototype.includes(:user)
   end
 
   def new
     @prototype = Prototype.new
   end
-  
-  def show
-    @prototype = Prototype.find(params[:id])
-    @comments = @prototype.comments
-    @comment = Comment.new
-  end
-  
+
   def create
     @prototype = Prototype.new(prototype_params)
     if @prototype.save
@@ -26,13 +20,15 @@ class PrototypesController < ApplicationController
     end
   end
 
+  def show
+    @comment = Comment.new
+    @comments = @prototype.comments
+  end
+  
   def edit
-    @prototype = Prototype.find(params[:id])
-
   end
 
   def update
-    @prototype = Prototype.find(params[:id])
     if @prototype.update(prototype_params)
        redirect_to prototype_path(@prototype)
     else
@@ -41,7 +37,6 @@ class PrototypesController < ApplicationController
   end
 
   def destroy
-    @prototype = Prototype.find(params[:id])
     if @prototype.destroy
       redirect_to root_path
     else
@@ -62,5 +57,3 @@ class PrototypesController < ApplicationController
     redirect_to root_path unless current_user == @prototype.user
   end
 end
-
-
